@@ -20,14 +20,6 @@ class Player:
     '''Code needed to connect with other player'''
     code = None
 
-    '''Constructor that is initialized when the connection with the
-    user is created.
-
-    params
-    ------
-        id (int): Helps to identify the user between multiple connections
-        ws (WebSocketServerProtocol): The websocket connection.
-    '''
     def __init__(self, ws: WebSocketServerProtocol):
         self.ws = ws
 

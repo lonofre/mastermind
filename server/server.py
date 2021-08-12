@@ -32,21 +32,27 @@ class Server:
         
         # When someone disconnects first
         if code in self.games:
-            other_player = None
             game = self.games[code]
-
-            if player.role == Role.CODEMAKER:
-                other_player = game['codebreaker']
-            else:
-                other_player = game['codemaker']
-
-            # To notify the disconnection of the other player
-            # to end the game
-            await self.send_error('disconnection', 
-                    'The other player has been disconnected',
-                    other_player.ws)
             
+            # This case covers when the
+            # game has started with two people
+            if len(self.games) == 2:    
+                other_player = None
+                
+                if player.role == Role.CODEMAKER:
+                    other_player = game['codebreaker']
+                else:
+                    other_player = game['codemaker']
+
+                # To notify the disconnection of the other player
+                # to end the game
+                await self.send_message('disconnection', 
+                        'The other player has been disconnected',
+                        other_player.ws)
+            
+
             del self.games[code]
+            
         
         
         logging.info(f'{ws.remote_address} disconnects')
@@ -58,27 +64,27 @@ class Server:
             action = content['action']
             data = content['data']
 
-            if action == 'register_code':
+            if action == 'registerCode':
                 await self.register_code(data, ws)
             elif action == 'play':
                 await self.play(data, ws)
 
         except json.decoder.JSONDecodeError:
-            await self.send_error('error', 'Can\'t process data', ws)
+            await self.send_message('error', 'Can\'t process data', ws)
         except FullGameError:
-            await self.send_error('full_game', 'The game is full', ws)
+            await self.send_message('full_game', 'The game is full', ws)
         except AttributeError:
-            await self.__send_error('error', 'There are missing attributes', ws)
+            await self.send_message('error', 'There are missing attributes', ws)
     
 
-    async def send_error(self, error_type: str, message: str, ws: WebSocketServerProtocol) -> dict:
-            error = {
-                'message_type': error_type,
+    async def send_message(self, message_type: str, message: str, ws: WebSocketServerProtocol) -> dict:
+            message = {
+                'messageType': message_type,
                 'data': {
                     'message': message
                 }
             }
-            await ws.send(json.dumps(error))
+            await ws.send(json.dumps(message))
 
 
     async def ws_handler(self, ws: WebSocketServerProtocol, uri: str):
@@ -115,6 +121,11 @@ class Server:
 
             player.role = Role.CODEBREAKER
             game['codebreaker'] = player
+            
+            other_player = game['codemaker']
+            await self.send_message('connection',
+                'The codebreaker has been connected',
+                other_player.ws)
 
         else:
             player.role = Role.CODEMAKER
@@ -126,7 +137,7 @@ class Server:
         self.players[ws] = player
 
         message = {
-            'message_type': 'role',
+            'messageType': 'role',
             'data': {
                 'role': player.role
             }
@@ -144,17 +155,17 @@ class Server:
         game = self.games[player.code]
         other_player = None
         message = {
-            'message_type': '',
+            'messageType': '',
             'data': {} 
         }
 
         if player.role == Role.CODEMAKER:
             message['data']['feedback'] = data['feedback']
-            message['message_type'] = 'feedback'
+            message['messageType'] = 'feedback'
             other_player = game['codebreaker']
         else:
             message['data']['pegs'] = data['pegs']
-            message['message_type'] = 'request_feedback'
+            message['messageType'] = 'request_feedback'
             other_player = game['codemaker']
         
         await other_player.ws.send(json.dumps(message))
