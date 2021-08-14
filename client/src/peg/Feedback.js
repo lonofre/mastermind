@@ -5,11 +5,7 @@ import './Feedback.css';
  * with 4 key pegs, so the player can
  * guess whether her key is correct
  */
-function Feedback(props){
-
-    const feedback = props.feedback;
-    const correctBoth = feedback.both;
-    const correctColors = feedback.color;
+function Feedback({correctBoth, correctColors}){
     
     const total = correctColors + correctBoth;
     
@@ -35,9 +31,6 @@ function Feedback(props){
         </div>
     );
 }
-
-
-
 
 
 export default Feedback;

@@ -1,5 +1,6 @@
 div.feedback {
     display: flex;
+    justify-content: center;
 }
 
 div.key-peg {
@@ -16,5 +17,5 @@ div.key-peg {
 
 .white {
     background-color: white;
-    border: 1px solid rgb(177, 177, 177);
+    border: 1px solid rgb(231, 231, 231);
 }

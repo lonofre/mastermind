@@ -3,6 +3,15 @@ div.peg {
     height: 60px;
     border-radius: 30px;
     box-shadow: 3px 3px rgb(224, 224, 224);
+    margin: 10px;
+}
+
+div.peg.small {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px rgb(224, 224, 224);
+    margin: 3px;
 }
 
 .clickeable:hover {
@@ -28,4 +37,16 @@ div.peg {
 
 .pink {
     background-color: pink;
+}
+
+.purple {
+    background-color: purple;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.brown {
+    background-color: brown;
 }

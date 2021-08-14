@@ -1,17 +1,14 @@
 import './Peg.css';
 
-function Peg(props){
 
-    const color = props.color;
-
-    // Indicates a css efect
-    const clickeable = props.clickeable;
+function Peg({color, clickeable, onClick, small}){
 
     let className = `peg ${color}`;
     className += (clickeable) ? ' clickeable' : '';
+    className += (small) ? ' small' : '';
 
     return (
-        <div className={className}>
+        <div className={className} onClick={onClick}>
         </div>
     );
 }

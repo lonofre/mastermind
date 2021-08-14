@@ -1,0 +1,43 @@
+span.codebreaker {
+    font-size: larger;
+    color: orange;
+}
+
+div.attempts {
+    margin: 40px;
+}
+
+div.feed {
+    margin-top: 40px;
+    color: gray;
+}
+
+
+button.code-button {
+    background-color: rgb(153, 0, 255);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 3px 3px rgb(228, 228, 228);
+    border-style: none;
+    font-weight: bold;
+}
+
+button.code-button:hover {
+    scale: 1.04;
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+button.code-button.deactivate {
+    background-color: gray;
+}
+
+button.code-button.deactivate:active {
+    background-color: gray;
+}
+
+button.code-button:active {
+    scale: 0.96;
+    background-color: rgb(112, 0, 187);
+}
