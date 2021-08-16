@@ -3,6 +3,14 @@ import Peg from './Peg';
 import './PegSelector.css';
 
 
+/**
+ * It's a component that allows to click on a peg
+ * and change its color
+ * @param {{number, function}} {props} where: 
+ * 
+ *        updatePegs: is a function used to fetch data
+ *        from the child (this component) to the parent       
+ */
 function PegSelector({ numOfPegs, updatePegs }){
 
     const [pegs, setPegs] = useState(initPages(numOfPegs));
@@ -22,6 +30,8 @@ function PegSelector({ numOfPegs, updatePegs }){
         let pegsArr = [...pegs];
         pegsArr[position] = peg;
         setPegs(pegsArr);
+
+        // Only if a function is provided
         if(updatePegs !== undefined){
             updatePegs( pegsArr.map( (peg) => colors[peg.colorIndex] ) );
         }
@@ -43,11 +53,21 @@ function PegSelector({ numOfPegs, updatePegs }){
 }
 
 
+/**
+ * Creates the Objects where the data of the pegs
+ * are stored.
+ * @param {number} numOfPegs 
+ * @returns {Object[]} where each Object
+ *          contains position of the peg and its color
+ */
 function initPages(numOfPegs){
     let pegs = [];
     for (let i = 0; i < numOfPegs; i++) {
         const peg = {
             position: i,
+            // Color index is stored instead of
+            // a string because it's more useful
+            // to iterate through a color array
             colorIndex: 0
         };
         pegs.push(peg);

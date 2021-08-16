@@ -1,0 +1,13 @@
+span.codemaker {
+    font-size: larger;
+    color: rgb(153, 0, 255);
+}
+
+.attemps {
+    margin-top: 40px;
+}
+
+b.to-win {
+    color: orange;
+    font-size: x-large;
+}

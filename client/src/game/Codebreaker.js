@@ -4,6 +4,11 @@ import Feedback from "../peg/Feedback";
 import PegList from "../peg/PegList";
 import './Codebreaker.css';
 
+/**
+ * Codebreaker offers the ability to
+ * select pegs to create a code
+ * and compare it to the codemaker's
+ */
 function Codebreaker(){
     
     const [code, setCode] = useState([]);

@@ -1,15 +1,15 @@
 import './Home.css';
-import Codebreaker from '../game/Codebreaker';
+import Codemaker from '../game/Codemaker';
 /**
  * This component is a start start point
  * to the players, so they can start playing
  * with someone
  */
-function Home() {
+function Home() {   
 
     return (
         <div>
-            <Codebreaker />
+            <Codemaker />
         </div>
     );
 }
