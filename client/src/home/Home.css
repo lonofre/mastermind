@@ -1,0 +1,16 @@
+div.room {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+input.room {
+    margin-bottom: 5px;
+    padding: 20px;
+    border-style: none;
+    background-color: rgb(230, 230, 230);
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    color: rgb(116, 116, 116);
+}

@@ -9,14 +9,25 @@ import './Codebreaker.css';
  * select pegs to create a code
  * and compare it to the codemaker's
  */
-function Codebreaker(){
+function Codebreaker({ websocket }){
     
     const [code, setCode] = useState([]);
     
     // Used to show the attemps to the user
     // and end the game if she pass the limit of attempts
     const [attempts, setAttempts] = useState([]);
+    const [startDecipher, setStartDecipher] = useState(false);
     const numAttempts = 10;
+
+    useEffect(()=> {
+        websocket.addEventListener('message', (event) => {
+            const message = JSON.parse(event.data);
+            console.log(message);
+            if(message.messageType === 'ready'){
+                setStartDecipher(true);
+            }
+        });
+    });
 
     function getCode(pegs){
         setCode(pegs);
@@ -55,6 +66,17 @@ function Codebreaker(){
         );
     }
 
+    // Wait content
+    if(!startDecipher){
+        return (
+            <div>
+                <h2>You're the <span className='codebreaker'>Codebreaker</span></h2>
+                <p>Wait to the codemaker to begin the game 🎮 </p>
+            </div>
+        )
+    }
+
+    // Where the game is developed
     return (
         <div>
             <h2>You're the <span className='codebreaker'>Codebreaker</span></h2>

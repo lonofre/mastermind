@@ -68,11 +68,13 @@ class Server:
                 await self.register_code(data, ws)
             elif action == 'play':
                 await self.play(data, ws)
+            elif action == 'startGame':
+                await self.start_game(ws)
 
         except json.decoder.JSONDecodeError:
             await self.send_message('error', 'Can\'t process data', ws)
         except FullGameError:
-            await self.send_message('full_game', 'The game is full', ws)
+            await self.send_message('fullGame', 'The game is full', ws)
         except AttributeError:
             await self.send_message('error', 'There are missing attributes', ws)
     
@@ -98,6 +100,14 @@ class Server:
     async def distribute(self, ws: WebSocketServerProtocol):
         async for message in ws:
             await self.send_to_client(message, ws)
+
+
+    async def start_game(self, ws: WebSocketServerProtocol):
+        '''Indicates to the codebreaker that he can begin to guess the code'''
+        player = self.players[ws]
+        game = self.games[player.code]
+        other_player = game['codebreaker']
+        await self.send_message('ready', 'The game begins', other_player.ws)
 
 
     async def register_code(self, data: dict, ws: WebSocketServerProtocol):
@@ -165,7 +175,7 @@ class Server:
             other_player = game['codebreaker']
         else:
             message['data']['pegs'] = data['pegs']
-            message['messageType'] = 'request_feedback'
+            message['messageType'] = 'requestFeedback'
             other_player = game['codemaker']
         
         await other_player.ws.send(json.dumps(message))
