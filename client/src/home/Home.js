@@ -45,7 +45,6 @@ function Home() {
         if(roomCode && !gameStarted){
             setGameStarted(true);
             websocket.send(codeMessage(roomCode));
-            console.log(websocket)
         }
     }
 

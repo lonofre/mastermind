@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PegSelector from "../peg/PegSelector";
 import PegList from "../peg/PegList";
+import { messageGameReady, messagaeFeedback } from "./messages";
 import './Codemaker.css';
 
 /**
@@ -19,24 +20,37 @@ function Codemaker({ websocket }) {
     const [alreadySent, setAlreadySent] = useState(false);
     // Indicates if the codebreaker has joined the game
     const [playerConnected, setPlayerConnected] = useState(false);
+    const [attempts, setAttempts] = useState([]);
     const numAttempts = 10;
 
 
     useEffect(() => {
         websocket.addEventListener('message', (event) => {
             const message = JSON.parse(event.data);
-            if(message.messageType === 'connection'){
-                setPlayerConnected(true);
+            const data = message.data;
+            switch (message.messageType) {
+                case 'connection':
+                    setPlayerConnected(true);
+                    break;
+                case 'requestFeedback':
+                    const attempt = data.pegs;
+                    const copy = [...attempts];
+                    copy.push(attempt);
+                    setAttempts(copy);
+                    websocket.send(messagaeFeedback(attempt, code));
+                    break;
+                default:
+                    break;
             }
         });
     });
 
-    // Mock data
-    const attemps = [
-        ['blue', 'red', 'blue', 'red'],
-        ['orange', 'red', 'blue', 'red'],
-        ['blue', 'red', 'green', 'red']
-    ]
+    useEffect(()=> {
+        if(attempts.length > numAttempts){
+            window.alert('YOU WIN!!!!!');
+            window.location.reload();
+        }
+    });
 
     function createCode() {
         if (code && playerConnected) {
@@ -62,12 +76,12 @@ function Codemaker({ websocket }) {
         );
     }
 
-    const pegLists = attemps.map((attemp, index) =>
+    const pegLists = attempts.map((attemp, index) =>
         <PegList colors={attemp} isSmall={true} key={index} />
     );
 
-    function attempsToWin(){
-        return numAttempts - attemps.length;
+    function attemptsToWin(){
+        return numAttempts - attempts.length;
     }
 
     return (
@@ -77,20 +91,14 @@ function Codemaker({ websocket }) {
                 <p>Your CODE (don't share it)</p>
                 <PegList colors={code} isSmall={false} />
             </div>
-            <div className='attemps'>
-                <p><b>Codebreker's</b> attempts ( <b className='to-win'>{attempsToWin()}</b> less to win )</p>
+            <div className='attempts'>
+                <p><b>Codebreker's</b> attempts ( <b className='to-win'>{attemptsToWin()}</b> less to win )</p>
                 {pegLists}
             </div>
         </>
     );
 }
 
-function messageGameReady(){
-    const message = {
-        action: 'startGame',
-        data: {}
-    }
-    return JSON.stringify(message);
-}
+
 
 export default Codemaker;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PegSelector from "../peg/PegSelector";
 import Feedback from "../peg/Feedback";
 import PegList from "../peg/PegList";
+import { messageRequestFeedback } from "./messages";
 import './Codebreaker.css';
 
 /**
@@ -13,18 +14,28 @@ function Codebreaker({ websocket }){
     
     const [code, setCode] = useState([]);
     
-    // Used to show the attemps to the user
+    // Used to show the attempts to the user
     // and end the game if she pass the limit of attempts
     const [attempts, setAttempts] = useState([]);
     const [startDecipher, setStartDecipher] = useState(false);
+    const [correctBoth, setCorrectBoth] = useState(0);
+    const [correctColors, setCorrectColors] = useState(0);
     const numAttempts = 10;
 
     useEffect(()=> {
         websocket.addEventListener('message', (event) => {
             const message = JSON.parse(event.data);
-            console.log(message);
-            if(message.messageType === 'ready'){
-                setStartDecipher(true);
+            const data = message.data;
+            switch (message.messageType) {
+                case 'ready':
+                    setStartDecipher(true);
+                    break;
+                case 'feedback':
+                    setCorrectBoth(data.feedback.correctBoth);
+                    setCorrectColors(data.feedback.correctColors);
+                    break;
+                default:
+                    break;
             }
         });
     });
@@ -39,6 +50,7 @@ function Codebreaker({ websocket }){
             let codes = [...attempts];
             codes.push(code);
             setAttempts(codes);
+            websocket.send(messageRequestFeedback(code));
         }
     }
 
@@ -47,7 +59,8 @@ function Codebreaker({ websocket }){
 
     useEffect(() => {
         if(attempts.length > numAttempts){
-            console.log('THE GAME END 🍌')
+            window.alert('YOU LOST!!!!!');
+            window.location.reload();
         }
     }, [attempts]);
 
@@ -56,9 +69,9 @@ function Codebreaker({ websocket }){
         <PegList key={index} colors={attempt} isSmall={true} />
     );
 
-    let attempsDiv;
+    let attemptsDiv;
     if(attempts.length > 0){
-        attempsDiv = (
+        attemptsDiv = (
             <div className='attempts'>
                 <p>Your attempts</p>
                 { previousCodes }
@@ -66,7 +79,7 @@ function Codebreaker({ websocket }){
         );
     }
 
-    // Wait content
+    // Wait content 
     if(!startDecipher){
         return (
             <div>
@@ -85,9 +98,11 @@ function Codebreaker({ websocket }){
             <button className={buttonClass} onClick={sendCode} >Try code</button>
             <div className='feed'>
                 <p>From the codemaker:</p>
-                <Feedback correctBoth={2} correctColors={1} />
+                <p>Both {correctBoth}</p>
+                <p>Colors {correctColors}</p>
+                <Feedback correctBoth={correctBoth} correctColors={correctColors} />
             </div>
-            { attempsDiv }
+            { attemptsDiv }
         </div>
     );
 

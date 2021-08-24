@@ -14,7 +14,7 @@ import './PegSelector.css';
 function PegSelector({ numOfPegs, updatePegs }){
 
     const [pegs, setPegs] = useState(initPages(numOfPegs));
-    const colors = ['orange', 'blue', 'red', 'green'];
+    const colors = ['orange', 'blue', 'red', 'green', 'purple', 'black'];
 
     function changeColor(position){
         let peg = pegs[position];
