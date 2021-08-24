@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PegSelector from "../peg/PegSelector";
 import PegList from "../peg/PegList";
+import AttemptsList from "./AttemptsList";
 import { messageGameReady, messagaeFeedback } from "./messages";
 import './Codemaker.css';
 
@@ -26,37 +27,45 @@ function Codemaker({ websocket }) {
 
     useEffect(() => {
         websocket.addEventListener('message', (event) => {
-            const message = JSON.parse(event.data);
-            const data = message.data;
-            switch (message.messageType) {
-                case 'connection':
-                    setPlayerConnected(true);
-                    break;
-                case 'requestFeedback':
-                    const attempt = data.pegs;
-                    const copy = [...attempts];
-                    copy.push(attempt);
-                    setAttempts(copy);
-                    websocket.send(messagaeFeedback(attempt, code));
-                    break;
-                default:
-                    break;
+            const { messageType } = JSON.parse(event.data);
+            if (messageType === 'connection') {
+                setPlayerConnected(true);
             }
         });
-    });
+    }, []);
 
-    useEffect(()=> {
-        if(attempts.length > numAttempts){
+    useEffect(() => {
+        if (alreadySent) {
+            websocket.addEventListener('message', (event) => {
+                const { messageType, data } = JSON.parse(event.data);
+                if (messageType === 'requestFeedback') {
+                    const attempt = data.pegs;
+                    websocket.send(messagaeFeedback(attempt, code));
+                    setAttempts(previous => [...previous, attempt]);
+                }
+            });
+        }
+    }, [alreadySent]);
+
+    useEffect(() => {
+        if (attempts.length >= 1) {
+            const [lastAttempt] = attempts.slice(-1);
+            if (lastAttempt.every((peg, i) => peg === code[i])) {
+                window.alert('YOU LOST!!!!!');
+                window.location.reload();
+            }
+        }
+        if (attempts.length > numAttempts) {
             window.alert('YOU WIN!!!!!');
             window.location.reload();
         }
-    });
+    }, [attempts]);
 
     function createCode() {
         if (code && playerConnected) {
             setAlreadySent(true);
             websocket.send(messageGameReady());
-        } else if(!playerConnected){
+        } else if (!playerConnected) {
             console.log('Wait for the other player 😠 ');
         }
     }
@@ -76,11 +85,8 @@ function Codemaker({ websocket }) {
         );
     }
 
-    const pegLists = attempts.map((attemp, index) =>
-        <PegList colors={attemp} isSmall={true} key={index} />
-    );
 
-    function attemptsToWin(){
+    function attemptsToWin() {
         return numAttempts - attempts.length;
     }
 
@@ -93,12 +99,10 @@ function Codemaker({ websocket }) {
             </div>
             <div className='attempts'>
                 <p><b>Codebreker's</b> attempts ( <b className='to-win'>{attemptsToWin()}</b> less to win )</p>
-                {pegLists}
+                <AttemptsList attempts={attempts} />
             </div>
         </>
     );
 }
-
-
 
 export default Codemaker;

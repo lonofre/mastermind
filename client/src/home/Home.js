@@ -1,6 +1,7 @@
 import './Home.css';
 import Codemaker from '../game/Codemaker';
 import Codebreaker from '../game/Codebreaker';
+import { codeMessage } from './message';
 import { useEffect, useState } from 'react';
 
 const PORT = 4000;
@@ -26,13 +27,15 @@ function Home() {
             if(message.messageType === 'role')
                 setRole(message.data.role);
         });
-    }, [roomCode])
+    });
     
     
+    // This is shown after a room code 
+    // was introduced successfully
     if(gameStarted && role){
         return (
             <div>
-                <p>Code <b>{roomCode}</b></p>
+                <p>Room <b>{roomCode}</b></p>
                 { role === 'codemaker' ?
                   <Codemaker websocket={websocket} /> :
                   <Codebreaker websocket={websocket} />
@@ -69,25 +72,6 @@ function Home() {
             </div>  
         </div>
     );
-}
-
-
-
-/**
- * Return the code message in json
- * that can be used to send to the server
- * @param {string} code 
- * @returns {string} the code in json
- */
-function codeMessage(code){
-    const message = {
-        action: 'registerCode',
-        data: {
-            code: code
-        }
-    };
-    const json = JSON.stringify(message);
-    return json;
 }
 
 export default Home;

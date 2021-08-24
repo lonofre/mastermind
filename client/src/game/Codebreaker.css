@@ -11,3 +11,8 @@ div.feed {
     margin-top: 40px;
     color: gray;
 }
+
+b.to-lose {
+    color: rgb(255, 0, 0);
+    font-size: x-large;
+}
